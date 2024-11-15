@@ -17,21 +17,41 @@ export class UsersService {
   }
 
   async create(user: CreateUserDto) {
-    const newUser = this.usersRepository.create(user);
+    const newUser = this.usersRepository.create({
+      usr_name: user.nome,
+      usr_email: user.email,
+      usr_password: user.senha,
+      usr_user_type: user.tipoUsuario,
+      usr_creation_date: user.dataCriacao || new Date(),
+    });
+
     return await this.usersRepository.save(newUser);
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
-    await this.usersRepository.update(Number(id), updateUserDto);
+    const updateData: Partial<User> = {
+      ...(updateUserDto.nome && { usr_name: updateUserDto.nome }),
+      ...(updateUserDto.email && { usr_email: updateUserDto.email }),
+      ...(updateUserDto.senha && { usr_password: updateUserDto.senha }),
+      ...(updateUserDto.datanascimento && {
+        usr_creation_date: new Date(updateUserDto.datanascimento),
+      }),
+    };
+    await this.usersRepository.update(Number(id), updateData);
     return this.usersRepository.findOne({ where: { usr_id: Number(id) } });
   }
 
   async remove(id: string) {
-    const userToRemove = await this.usersRepository.findOne({ where: { usr_id: Number(id) } });
-    if (userToRemove) {
-      await this.usersRepository.remove(userToRemove);
-      return userToRemove;
+    // Converte o ID da string para número
+    const userId = Number(id);
+    if (isNaN(userId)) {
+      throw new Error(`Invalid ID: ${id}`); // Se o ID não for válido, lança um erro
     }
-    return null; // Usuário não encontrado
+    const userToRemove = await this.usersRepository.findOne({ where: { usr_id: userId } });
+    if (!userToRemove) {
+      return null;
+    }
+    await this.usersRepository.remove(userToRemove);
+    return userToRemove;
   }
 }

@@ -10,14 +10,17 @@ import { Attendance } from './users/entities/attendance.entity';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
-      type: 'sqlite',
-      database: 'db.sqlite',
+      type: 'postgres',
+      host: 'localhost',
+      port: 5432,
+      database: 'membersarea',
+      username: 'postgres',
+      password: '99622',
       entities: [User, Course, Lesson, Progress, Attendance],
-      synchronize: true, // Isso deve criar as tabelas automaticamente
+      synchronize: true,
       logging: true,
     }),
     UsersModule,
-    // Outros módulos
   ],
 })
 export class AppModule {}

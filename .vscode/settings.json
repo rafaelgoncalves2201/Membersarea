@@ -9,6 +9,16 @@
             "database": "areamembros",
             "username": "postgres",
             "password": "99622"
+        },
+        {
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 5432,
+            "driver": "PostgreSQL",
+            "name": "PG Local",
+            "database": "membersarea",
+            "username": "postgres",
+            "password": "99622"
         }
     ]
 }

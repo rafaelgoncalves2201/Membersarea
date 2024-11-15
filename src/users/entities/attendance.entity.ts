@@ -1,6 +1,6 @@
-// src/users/entities/attendance.entity.ts
-import { User } from '../users/entities/user.entity';  // Ensure correct path
-import { Lesson } from './lesson.entity';  // Correct the import path
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { User } from './user.entity';
+import { Lesson } from './lesson.entity';
 
 @Entity('attendance')
 export class Attendance {

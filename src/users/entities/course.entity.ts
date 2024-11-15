@@ -1,6 +1,5 @@
-// src/users/entities/course.entity.ts
-import { User } from '../users/entities/user.entity';  // Ensure correct path
-import { Course } from './course.entity'; // Fix path as needed
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { User } from './user.entity';
 
 @Entity('courses')
 export class Course {
@@ -10,7 +9,7 @@ export class Course {
   @Column({ length: 150 })
   title: string;
 
-  @Column('text') 
+  @Column('text')
   description: string;
 
   @ManyToOne(() => User, { onDelete: 'CASCADE' }) // Link with ADMIN (User)
