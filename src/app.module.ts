@@ -1,26 +1,22 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
-import { User } from './users/entities/user.entity';
-import { Course } from './users/entities/course.entity';
-import { Lesson } from './users/entities/lesson.entity';
-import { Progress } from './users/entities/progress.entity';
-import { Attendance } from './users/entities/attendance.entity';
+import { ConfigModule } from '@nestjs/config';
+import { DbModule } from './db/db.module';
+import { AttendanceModule } from './attendance/attendance.module';
+import { LessonsModule } from './lessons/lessons.module';
+import { ProgressModule } from './progress/progress.module';
+import { CoursesModule } from './courses/courses.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      database: 'membersarea',
-      username: 'postgres',
-      password: '99622',
-      entities: [User, Course, Lesson, Progress, Attendance],
-      synchronize: true,
-      logging: true,
-    }),
-    UsersModule,
-  ],
+  imports: [ConfigModule.forRoot({ isGlobal: true }), 
+  DbModule,
+  UsersModule,
+  AttendanceModule,
+  LessonsModule,
+  ProgressModule,
+  CoursesModule,
+],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}

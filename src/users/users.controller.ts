@@ -1,29 +1,33 @@
-import { Controller, Get, Post, Body, Param, Delete, Put } from '@nestjs/common';
+import { Body, Controller, Post, Get, Param, Put, Query, Delete } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UsersDto } from './user.dto';  // Removido o FindAllParameters
 
 @Controller('users')
 export class UsersController {
-  constructor(private usersService: UsersService) {}
+    constructor(private readonly userService: UsersService) {}
 
-  @Get()
-  findAll() {
-    return this.usersService.findAll();
-  }
+    @Post()
+    async create(@Body() user: UsersDto): Promise<UsersDto> {
+        return await this.userService.create(user);
+    }
 
-  @Post()
-  create(@Body() user: CreateUserDto) {
-    return this.usersService.create(user);
-  }
+    @Get('/:id')
+    async findById(@Param('id') id: string) {
+        return await this.userService.findById(id);
+    }
 
-  @Put(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(id, updateUserDto);
-  }
+    @Get()
+    async findAll(@Query('filter') filter: string = ''): Promise<UsersDto[]> {  // Removido o FindAllParameters
+        return await this.userService.findAll(filter);  // Passando o filtro diretamente
+    }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(id);
-  }
+    @Put('/:id')
+    async update(@Param('id') id: string, @Body() user: UsersDto) {
+        await this.userService.update(id, user);
+    }
+
+    @Delete('/:id')
+    async remove(@Param('id') id: string) {
+        return await this.userService.remove(id);
+    }
 }
