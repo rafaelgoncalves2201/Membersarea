@@ -1,45 +1,41 @@
+import { Injectable } from '@nestjs/common';
+import { CreateAttendanceDto } from './dto/create-attendance.dto';
+import { UpdateAttendanceDto } from './dto/update-attendance.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Attendance } from './entities/attendance.entity';
+import { Repository } from 'typeorm';
+
 @Injectable()
 export class AttendanceService {
-    private attendances: AttendanceDto[] = []; // Usando um array em memória para simulação
+  constructor(
+    @InjectRepository(Attendance)
+    private readonly repository: Repository<Attendance>
+  ){
 
-    create(attendance: AttendanceDto): AttendanceDto {
-        // Simulação de ID gerado como UUID (não se usa auto incremento para UUID)
-        attendance.id = this.generateUUID();  // Alterado para usar um UUID
-        this.attendances.push(attendance);
-        return attendance;
-    }
+  }
+  create(attendanceDto: CreateAttendanceDto) {
+    const attendance = this.repository.create(attendanceDto);
+    return this.repository.save(attendance);
+  }
 
-    findAll(): AttendanceDto[] {
-        return this.attendances; // Retorna todos os atendimentos sem parâmetros adicionais
-    }
+  findAll() {
+    return this.repository.find();
+  }
 
-    findOne(id: string): AttendanceDto | undefined {  // Alterado para usar string
-        return this.attendances.find(att => att.id === id);
-    }
+  findOne(id: string) {
+    return this.repository.findOneBy({ id });
+  }
 
-    update(id: string, updateAttendance: Partial<AttendanceDto>): AttendanceDto | undefined {  // Alterado para usar string
-        const attendance = this.findOne(id);
-        if (attendance) {
-            Object.assign(attendance, updateAttendance);
-            return attendance;
-        }
-        return undefined;
-    }
+  async update(id: string, attendanceDto: UpdateAttendanceDto) {
+    const attendance = await this.repository.findOneBy({ id });
+    if(!attendance) return null;
+    this.repository.merge(attendance, attendanceDto);
+    return this.repository.save(attendance);
+  }
 
-    remove(id: string): boolean {  // Alterado para usar string
-        const index = this.attendances.findIndex(att => att.id === id);
-        if (index !== -1) {
-            this.attendances.splice(index, 1);
-            return true;
-        }
-        return false;
-    }
-
-    // Função simples para gerar um UUID
-    private generateUUID(): string {
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-            const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
-            return v.toString(16);
-        });
-    }
+  async remove(id: string) {
+    const attendance = await this.repository.findOneBy({ id });
+    if (!attendance) return null;
+    return this.repository.remove(attendance);
+  }
 }

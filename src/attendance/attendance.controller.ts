@@ -1,33 +1,40 @@
-import { Controller, Post, Get, Param, Put, Body, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, HttpCode } from '@nestjs/common';
 import { AttendanceService } from './attendance.service';
-import { AttendanceDto } from './attendance.dto';
+import { CreateAttendanceDto } from './dto/create-attendance.dto';
+import { UpdateAttendanceDto } from './dto/update-attendance.dto';
 
 @Controller('attendance')
 export class AttendanceController {
-    constructor(private readonly attendanceService: AttendanceService) {}
+  constructor(private readonly attendanceService: AttendanceService) {}
 
-    @Post()
-    create(@Body() attendance: AttendanceDto): AttendanceDto {
-        return this.attendanceService.create(attendance);
-    }
+  @Post()
+  create(@Body() createAttendanceDto: CreateAttendanceDto) {
+    return this.attendanceService.create(createAttendanceDto);
+  }
 
-    @Get()
-    findAll(): AttendanceDto[] {
-        return this.attendanceService.findAll(); // Não há parâmetros adicionais aqui
-    }
+  @Get()
+  findAll() {
+    return this.attendanceService.findAll();
+  }
 
-    @Get('/:id')
-    findOne(@Param('id') id: number): AttendanceDto | undefined {
-        return this.attendanceService.findOne(id);
-    }
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    const attendance = await this.attendanceService.findOne(id);
+    if(!attendance) throw new NotFoundException();
+    return attendance;
+  }
 
-    @Put('/:id')
-    update(@Param('id') id: number, @Body() updateAttendance: Partial<AttendanceDto>): AttendanceDto | undefined {
-        return this.attendanceService.update(id, updateAttendance);
-    }
+  @Patch(':id')
+  async update(@Param('id') id: string, @Body() updateAttendanceDto: UpdateAttendanceDto) {
+    const attendance = await this.attendanceService.update(id, updateAttendanceDto);
+    if(!attendance) throw new NotFoundException();
+    return attendance;
+  }
 
-    @Delete('/:id')
-    remove(@Param('id') id: number): boolean {
-        return this.attendanceService.remove(id);
-    }
+  @Delete(':id')
+  @HttpCode(204)
+  async remove(@Param('id') id: string) {
+    const attendance = await this.attendanceService.remove(id);
+    if(!attendance) throw new NotFoundException();
+  }
 }

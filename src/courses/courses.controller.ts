@@ -1,33 +1,40 @@
-import { Body, Controller, Post, Get, Param, Put, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, HttpCode } from '@nestjs/common';
 import { CoursesService } from './courses.service';
-import { CoursesDto } from './courses.dto';
+import { CreateCourseDto } from './dto/create-course.dto';
+import { UpdateCourseDto } from './dto/update-course.dto';
 
 @Controller('courses')
 export class CoursesController {
-    constructor(private readonly coursesService: CoursesService) {}
+  constructor(private readonly coursesService: CoursesService) {}
 
-    @Post()
-    async create(@Body() course: CoursesDto): Promise<CoursesDto> {
-        return await this.coursesService.create(course);
-    }
+  @Post()
+  create(@Body() courseDto: CreateCourseDto) {
+    return this.coursesService.create(courseDto);
+  }
 
-    @Get('/:id')
-    async findById(@Param('id') id: string) {
-        return await this.coursesService.findById(id);
-    }
+  @Get()
+  findAll() {
+    return this.coursesService.findAll();
+  }
 
-    @Get()
-    async findAll(): Promise<CoursesDto[]> {
-        return await this.coursesService.findAll();
-    }
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    const course = await this.coursesService.findOne(id);
+    if(!course) throw new NotFoundException();
+    return course;
+  }
 
-    @Put('/:id')
-    async update(@Param('id') id: string, @Body() course: CoursesDto) {
-        await this.coursesService.update(id, course);
-    }
+  @Patch(':id')
+  async update(@Param('id') id: string, @Body() updatecourseDto: UpdateCourseDto) {
+    const course = await this.coursesService.update(id, updatecourseDto);
+    if(!course) throw new NotFoundException();
+    return course;
+  }
 
-    @Delete('/:id')
-    async remove(@Param('id') id: string) {
-        return await this.coursesService.remove(id);
-    }
+  @Delete(':id')
+  @HttpCode(204)
+  async remove(@Param('id') id: string) {
+    const course = await this.coursesService.remove(id);
+    if(!course) throw new NotFoundException();
+  }
 }

@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
-import { ProgressController } from './progress.controller';
 import { ProgressService } from './progress.service';
-import { ProgressEntity } from '../db/entities/progress.entity';
+import { ProgressController } from './progress.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { Progress } from './entities/progress.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ProgressEntity])],
+  imports: [TypeOrmModule.forFeature([Progress])],
   controllers: [ProgressController],
   providers: [ProgressService],
 })

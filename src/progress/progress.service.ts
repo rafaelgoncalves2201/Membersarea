@@ -1,47 +1,41 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { CreateProgressDto } from './dto/create-progress.dto';
+import { UpdateProgressDto } from './dto/update-progress.dto';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Progress } from './entities/progress.entity';
 import { Repository } from 'typeorm';
-import { ProgressDto } from './progress.dto';
-import { ProgressEntity } from '../db/entities/progress.entity';
 
 @Injectable()
 export class ProgressService {
-    constructor(
-        @InjectRepository(ProgressEntity)
-        private progressRepository: Repository<ProgressEntity>,
-    ) {}
+  constructor(
+    @InjectRepository(Progress)
+    private readonly repository: Repository<Progress>
+  ){
 
-    // Método create ajustado para usar o objeto completo
-    async create(newProgress: ProgressDto): Promise<ProgressEntity> {
-        // Cria uma nova instância de ProgressEntity com os dados de ProgressDto
-        const progress = this.progressRepository.create(newProgress);
-        return this.progressRepository.save(progress);
-    }
+  }
+  create(progressDto: CreateProgressDto) {
+    const progress = this.repository.create(progressDto);
+    return this.repository.save(progress);
+  }
 
-    async findById(id: string): Promise<ProgressEntity> {
-        const progress = await this.progressRepository.findOne({ where: { id } });
+  findAll() {
+    return this.repository.find();
+  }
 
-        if (!progress) {
-            throw new ConflictException(`Progress with ID '${id}' not found`);
-        }
+  findOne(id: string) {
+    return this.repository.findOneBy({ id });
+  }
 
-        return progress;
-    }
+  async update(id: string, progressDto: UpdateProgressDto) {
+    const progress = await this.repository.findOneBy({ id });
+    if (!progress) return null;
+    this.repository.merge(progress, progressDto);
+    return this.repository.save(progress);
+  }
 
-    async findAll(): Promise<ProgressEntity[]> {
-        return this.progressRepository.find();
-    }
-
-    async update(id: string, updateData: Partial<ProgressDto>): Promise<ProgressEntity> {
-        const progress = await this.findById(id);
-
-        // Atualiza o objeto progress com os novos dados
-        Object.assign(progress, updateData);
-        return this.progressRepository.save(progress);
-    }
-
-    async remove(id: string): Promise<void> {
-        const progress = await this.findById(id);
-        await this.progressRepository.remove(progress);
-    }
+  async remove(id: string) {
+    const progress = await this.repository.findOneBy({ id });
+    if (!progress) return null;
+    return this.repository.remove(progress);
+  }
 }

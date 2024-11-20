@@ -1,33 +1,45 @@
-import { Body, Controller, Post, Get, Param, Put, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, HttpCode } from '@nestjs/common';
 import { LessonsService } from './lessons.service';
-import { LessonsDto } from './lessons.dto';
+import { CreateLessonDto } from './dto/create-lesson.dto';
+import { UpdateLessonDto } from './dto/update-lesson.dto';
 
 @Controller('lessons')
 export class LessonsController {
-    constructor(private readonly lessonsService: LessonsService) {}
+  constructor(private readonly lessonsService: LessonsService) {}
 
-    @Post()
-    async create(@Body() lesson: LessonsDto): Promise<LessonsDto> {
-        return await this.lessonsService.create(lesson);
+  @Post()
+  async create(@Body() createLessonDto: CreateLessonDto) {
+    // Verifica se o curso associado existe
+    try {
+      return await this.lessonsService.create(createLessonDto);
+    } catch (error) {
+      throw new NotFoundException('Course not found');
     }
+  }
 
-    @Get('/:id')
-    async findById(@Param('id') id: string) {
-        return await this.lessonsService.findById(id);
-    }
+  @Get()
+  findAll() {
+    return this.lessonsService.findAll();
+  }
 
-    @Get()
-    async findAll(): Promise<LessonsDto[]> {
-        return await this.lessonsService.findAll(); // Não precisa de params
-    }
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    const lesson = await this.lessonsService.findOne(id);
+    if(!lesson) throw new NotFoundException();
+    return lesson;
+  }
 
-    @Put('/:id')
-    async update(@Param('id') id: string, @Body() lesson: LessonsDto) {
-        await this.lessonsService.update(id, lesson);
-    }
+  @Patch(':id')
+  async update(@Param('id') id: string, @Body() updateLessonDto: UpdateLessonDto) {
+    const lesson = await this.lessonsService.update(id, updateLessonDto);
+    if(!lesson) throw new NotFoundException();
+    return lesson;
+  }
 
-    @Delete('/:id')
-    async remove(@Param('id') id: string) {
-        return await this.lessonsService.remove(id);
-    }
+  @Delete(':id')
+  @HttpCode(204)
+  async remove(@Param('id') id: string) {
+    const lesson = await this.lessonsService.remove(id);
+    if(!lesson) throw new NotFoundException();
+  }
 }
