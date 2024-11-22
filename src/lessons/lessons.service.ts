@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateLessonDto } from './dto/create-lesson.dto';
 import { UpdateLessonDto } from './dto/update-lesson.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -14,7 +14,11 @@ export class LessonsService {
 
   }
   create(lessonDto: CreateLessonDto) {
-    const lesson = this.repository.create(lessonDto);
+    const course = this.repository.findOneBy({ id: lessonDto.course_id });
+    if (!course){
+      throw new BadRequestException('Invalid course ID');
+    }
+    const lesson = this.repository.create({ ...lessonDto });
     return this.repository.save(lesson);
   }
 

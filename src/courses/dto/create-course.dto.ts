@@ -1,4 +1,4 @@
-import { IsDateString, IsString } from "class-validator";
+import { IsDateString, IsString, IsUUID } from "class-validator";
 
 export class CreateCourseDto {
 
@@ -9,10 +9,8 @@ export class CreateCourseDto {
     description: string;
 
     @IsString()
+    @IsUUID()
     admin_id: string;
-
-    @IsDateString()
-    creation_date: Date;
 
     @IsString()
     cover_url: string;

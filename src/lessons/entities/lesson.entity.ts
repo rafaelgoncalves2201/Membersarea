@@ -1,5 +1,5 @@
 import { Course } from "src/courses/entities/course.entity";
-import { Entity, JoinColumn, Column, ManyToOne, PrimaryColumn } from "typeorm";
+import { Entity, JoinColumn, Column, ManyToOne, PrimaryColumn, BeforeInsert } from "typeorm";
 
 const { nanoid } = require("nanoid")
 
@@ -22,5 +22,14 @@ export class Lesson {
 
     @Column('varchar')
     couse_id: string;
+
+    @ManyToOne(() => Course, (course) => course.id, { nullable: false, onDelete: 'CASCADE'})
+    @JoinColumn({ name: 'course_id '})
+    course: Course;
+
+    @BeforeInsert()
+    generateId(){
+        this.id = `lessons_${nanoid()}`;
+    }
 
 }

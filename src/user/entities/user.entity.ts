@@ -1,8 +1,9 @@
+import { IsIn } from "class-validator";
 import { BeforeInsert, Column, Entity, PrimaryColumn } from "typeorm";
 
 const { nanoid } = require("nanoid")
 
-@Entity('users')
+@Entity('user')
 export class User {
 
     @PrimaryColumn('varchar')
@@ -18,14 +19,18 @@ export class User {
     usr_password: string;
 
     @Column('char', {length: 10})
+    @IsIn(['admin', 'student', 'student'])
     usr_user_type: string;
 
-    @Column()
+    @Column({ type: 'timestamp' })
     usr_creation_date: Date;
 
     @BeforeInsert()
     generateId(){
-        this.id = `user_${nanoid()}`;
+        const prefix = this.usr_user_type === 'admin'
+        ? 'admin' : this.usr_user_type === 'student'
+        ? 'student' : 'user';
+        this.id = `${prefix}_${nanoid()}`;
         this.usr_creation_date = new Date();
     }
 }

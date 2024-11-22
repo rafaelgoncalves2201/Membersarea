@@ -1,17 +1,21 @@
-import { IsDateString, IsNumber, IsString } from "class-validator";
+import { IsDateString, IsNumber, IsString, IsUUID, Max, Min } from "class-validator";
 import { Double } from "typeorm";
 
 export class CreateProgressDto {
 
     @IsString()
+    @IsUUID()
     stdent_id: string;
 
     @IsString()
+    @IsUUID()
     course_id: string;
 
     @IsNumber()
+    @Min(0)
+    @Max(100)
     percentage: Double;
 
     @IsDateString()
-    uodate_date: Date;
+    update_date: Date;
 }

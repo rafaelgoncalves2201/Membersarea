@@ -1,4 +1,5 @@
-import { BeforeInsert, Column, Entity, PrimaryColumn } from "typeorm";
+import { User } from "src/user/entities/user.entity";
+import { BeforeInsert, Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
 const { nanoid } = require("nanoid")
 
 @Entity('courses')
@@ -13,6 +14,10 @@ export class Course {
     @Column('varchar')
     description: string;
 
+    @ManyToOne(() => User, (user) => user.id)
+    @JoinColumn({ name: 'admin_id'})
+    admin: User;
+
     @Column('varchar')
     admin_id: string;
 
@@ -24,6 +29,7 @@ export class Course {
 
     @BeforeInsert()
     generateId(){
-        this.id = `courses_${nanoid()}`
+        this.id = `courses_${nanoid()}`;
+        this.creation_date = new Date();
     }
 }

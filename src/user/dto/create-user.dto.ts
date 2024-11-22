@@ -13,7 +13,4 @@ export class CreateUserDto {
 
     @IsString()
     usr_user_type: string;
-
-    @IsDateString()
-    usr_creation_date: Date;
 }

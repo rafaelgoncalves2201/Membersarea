@@ -1,11 +1,13 @@
-import { IsBoolean, IsDateString, IsString } from "class-validator";
+import { IsBoolean, IsDateString, IsString, IsUUID } from "class-validator";
 
 export class CreateAttendanceDto {
 
     @IsString()
+    @IsUUID()
     student_id: string;
 
     @IsString()
+    @IsUUID()
     lesson_id: string;
 
     @IsBoolean()

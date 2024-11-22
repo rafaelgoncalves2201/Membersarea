@@ -1,4 +1,6 @@
-import { BeforeInsert, Column, Entity, PrimaryColumn } from "typeorm";
+import { BeforeInsert, Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
+import { User } from "src/user/entities/user.entity";
+import { Lesson } from "src/lessons/entities/lesson.entity";
 
 const { nanoid } = require("nanoid")
 
@@ -13,6 +15,15 @@ export class Attendance {
 
     @Column()
     lesson_id: string;
+
+    @ManyToOne(() => User, (user) => user.id)
+    @JoinColumn({ name: 'student_id'})
+    student: User;
+    
+
+    @ManyToOne(() => Lesson, (lesson) => lesson.id, { nullable: false, onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'lesson_id' })
+    lesson: Lesson;
 
     @Column({
         type: 'bit',

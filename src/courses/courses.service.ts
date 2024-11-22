@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Course } from './entities/course.entity';
@@ -13,8 +13,20 @@ export class CoursesService {
 ){
 
 }
-  create(courseDto: CreateCourseDto) {
-    const course = this.repository.create(courseDto);
+  async create(courseDto: CreateCourseDto) {
+
+    const admin = await this.repository
+      .createQueryBuilder('course')
+      .leftJoinAndSelect('course.admin', 'admin')
+      .where('course.admin_id = :admin_id', { admin_id: courseDto.admin_id })
+      .andWhere('admin.user_type = :user_type', { user_type: 'admin' })
+      .getOne();
+
+    if (!admin) {
+      throw new BadRequestException('Only admins can create courses.');
+    }
+
+    const course = this.repository.create({ ...courseDto, admin_id: admin.id });
     return this.repository.save(course);
   }
 
