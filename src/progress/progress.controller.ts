@@ -1,8 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, UseGuards } from '@nestjs/common';
 import { ProgressService } from './progress.service';
 import { CreateProgressDto } from './dto/create-progress.dto';
 import { UpdateProgressDto } from './dto/update-progress.dto';
+import { AuthGuard } from 'src/auth/auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('progress')
 export class ProgressController {
   constructor(private readonly progressService: ProgressService) {}
